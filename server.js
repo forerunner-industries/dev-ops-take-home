@@ -1,11 +1,13 @@
-const express = require("express");
+const express = require("express"); // import the application server framework
 const { Pool } = require("pg"); // Import the PostgreSQL library
 
+var args = process.argv.slice(2);
+const debugOn = args[0] === "--debug";
+
 const app = express();
-// get environment variables PORT, USER, and PASSWORD
+// get environment variables
 const { PORT: port, USER: user, PASSWORD: password } = process.env;
 
-// Create a PostgreSQL connection pool
 const pool = new Pool({
   user,
   password,
@@ -13,12 +15,19 @@ const pool = new Pool({
   port: 5432,
 });
 
+const maximumStartupTime = 120_000; // 2 minutes
+const minimumStartupTime = 60_000; // 1 minute
+const startupTimeRequired =
+  Math.floor(Math.random() * (maximumStartupTime - minimumStartupTime)) + minimumStartupTime;
+
 // Track the application start time
 const startTime = Date.now();
-const startupTimeRequired =
-  Math.floor(Math.random() * (120000 - 60000 + 1)) + 60000;
 
 app.get("/healthcheck", (req, res) => {
+  if(debugOn) {
+    console.debug(`Healthcheck called with headers ${JSON.stringify(req.headers)}`);
+  }
+
   // Calculate the time elapsed since the application started (in milliseconds)
   const elapsedTime = Date.now() - startTime;
 
