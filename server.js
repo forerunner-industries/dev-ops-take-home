@@ -6,7 +6,7 @@ const debugOn = args[0] === "--debug";
 
 const app = express();
 // get environment variables
-const { PORT: port, USER: user, PASSWORD: password } = process.env;
+const { PORT: port, PG_USER: user, PG_PASSWORD: password } = process.env;
 
 const pool = new Pool({
   user,
